@@ -13,6 +13,7 @@ public class AuthDbContext : AuditableDbContext
     }
 
     public DbSet<Usuario> Usuarios => Set<Usuario>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -25,6 +26,18 @@ public class AuthDbContext : AuditableDbContext
 
             entity.HasIndex(u => u.Username).IsUnique();
             entity.HasIndex(u => u.Email).IsUnique();
+        });
+
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(rt => rt.IdRefreshToken);
+            entity.Property(rt => rt.TokenHash).IsRequired().HasMaxLength(64);
+            entity.HasIndex(rt => rt.TokenHash).IsUnique();
+
+            entity.HasOne(rt => rt.Usuario)
+                .WithMany()
+                .HasForeignKey(rt => rt.IdUsuario)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         ApplySoftDeleteQueryFilters(modelBuilder);

@@ -27,5 +27,17 @@ public static class AuthEndpoints
             var resultado = await authService.LoginAsync(request);
             return resultado is null ? Results.Unauthorized() : Results.Ok(resultado);
         });
+
+        group.MapPost("/refresh", async (RefreshRequest request, IAuthService authService) =>
+        {
+            var resultado = await authService.RefreshAsync(request);
+            return resultado is null ? Results.Unauthorized() : Results.Ok(resultado);
+        });
+
+        group.MapPost("/logout", async (LogoutRequest request, IAuthService authService) =>
+        {
+            await authService.LogoutAsync(request);
+            return Results.NoContent();
+        });
     }
 }
