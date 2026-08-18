@@ -637,7 +637,7 @@ Se verificó el CRUD completo de `/historial` (crear, listar, obtener por id, ac
 - [ ] Actualizar `dotnet-ef` a la versión que coincide con el runtime (10.0.11) cuando se resuelva el error de reinstalación.
 - [ ] Desplegar frontend en el mismo VPS.
 - [ ] Configurar HTTPS en el Gateway (hoy el puerto 80 es HTTP plano) — típicamente con un reverse proxy adicional tipo Caddy/Nginx + Let's Encrypt, o Kestrel con certificado si el Gateway queda expuesto directo.
-- [ ] Al desplegar Serilog al VPS: verificar permisos de escritura en `~/comidiaria/backend-net/logs/<servicio>/` — las imágenes `aspnet` recientes corren como usuario no-root dentro del contenedor, y si Docker crea la carpeta del bind mount como `root` en el host, el proceso puede no tener permiso de escritura (sección 17.4).
+- [x] Verificado en el deploy real: `~/comidiaria/backend-net/logs/<servicio>/` se creó sin problemas de permisos y los 4 servicios escriben sus logs correctamente (sección 17.4).
 
 ## 15. Convención de estructura para nuevos servicios
 
@@ -981,3 +981,42 @@ Así los logs quedan en `~/comidiaria/backend-net/logs/meals-api/` en el VPS, vi
 ### 17.5 Qué se probó
 
 Se corrieron `Meals.Api`, `Planner.Api` y `Auth.Api` localmente contra la base real del VPS (vía túnel SSH) y se confirmó: la consola ya no muestra el formato default de ASP.NET Core sino el de Serilog; cada request genera una línea; el archivo `logs/{Servicio}-<fecha>.log` se crea con el mismo contenido; una request con JWT válido muestra `"UserId":"<id>"` y una sin token muestra `"UserId":null`; y el campo `"Service"` distingue correctamente el origen al probar `Meals.Api` y `Planner.Api` en paralelo.
+
+## 18. Bug real en el primer deploy con `BuildingBlocks`: `Directory.Packages.props` faltante en los Dockerfiles
+
+Al desplegar la versión con `Auth`, JWT y Serilog (`v0.2.0`), el pipeline de GitHub Actions reportó **éxito**, pero el VPS no actualizó ningún contenedor y `auth-api` ni siquiera existía. Dos bugs distintos se combinaron para que el fallo pasara desapercibido.
+
+### 18.1 El bug real: ningún Dockerfile copiaba `Directory.Packages.props`
+
+Desde que se introdujo Central Package Management (sección 13.3), todos los `.csproj` de la solución dejaron de declarar `Version="..."` en sus `PackageReference` — la versión se resuelve leyendo `Directory.Packages.props` en la raíz del repo. Eso funciona perfecto con `dotnet build` desde la raíz (MSBuild encuentra el archivo subiendo por el árbol de carpetas), pero **ningún Dockerfile fue actualizado para copiar ese archivo** al contexto de build antes de correr `dotnet restore`. Dentro del contenedor, el `.csproj` quedaba aislado sin acceso a `Directory.Packages.props`, y el build fallaba con:
+```
+error NU1015: The following PackageReference item(s) do not have a version specified: ...
+```
+Esto afectaba a **los 4 servicios**, no solo al nuevo `Auth` — simplemente nunca se había notado porque, desde que se agregó CPM, no se había vuelto a correr un build Docker real hasta este deploy (los intentos anteriores de `docker compose build` fallaron por Docker Desktop apagado localmente, sección 13, y quedaron sin verificar).
+
+**Fix**: agregar una línea a cada Dockerfile, justo después del primer `WORKDIR /src`, antes de cualquier otro `COPY`:
+```dockerfile
+COPY ["Directory.Packages.props", "./"]
+```
+
+El `ApiGateway` tenía además un segundo problema: nunca se actualizó su Dockerfile para copiar los `.csproj` de `BuildingBlocks/` cuando se le agregó esa referencia (sección 17), así que ni siquiera encontraba el proyecto.
+
+### 18.2 Por qué el pipeline no avisó del error
+
+El script del workflow (`.github/workflows/deploy.yml`) corre varios comandos en secuencia dentro de un solo bloque `script:` de `appleboy/ssh-action`, **sin `set -e`**:
+```yaml
+script: |
+  cd ~/comidiaria/backend-net
+  git fetch --tags --force
+  git checkout ${{ github.ref_name }}
+  docker compose build
+  docker compose up -d
+  docker image prune -f
+```
+Sin `set -e`, un bash script sigue ejecutando la siguiente línea aunque la anterior falle (a diferencia de encadenar con `&&`). `docker compose build` falló, pero el script igual llegó a `docker compose up -d` (que no tenía nada nuevo que levantar, así que "tuvo éxito" trivialmente) y a `docker image prune -f` (que también tuvo éxito). El **último** comando del script determina el código de salida que ve `appleboy/ssh-action` — como fue exitoso, GitHub Actions marcó todo el job en verde, ocultando que el paso realmente importante había fallado en silencio.
+
+**Fix**: agregar `set -e` como primera línea del script — ahora cualquier comando que falle corta la ejecución inmediatamente y el job queda en rojo, reflejando la realidad.
+
+### 18.3 Cómo se detectó y verificó
+
+Después del "deploy exitoso", se notó que los contenedores en el VPS seguían con el mismo *uptime* de antes (no se habían recreado) y que `auth-api` no aparecía en `docker ps`. Se corrió `docker compose build` manualmente por SSH para reproducir el error real, se aplicó el fix en los 4 Dockerfiles + el workflow, se copiaron los Dockerfiles corregidos al VPS para una prueba manual (`docker compose build` completo, exitoso) y se levantaron los contenedores (`docker compose up -d`) — confirmando por primera vez `auth-api` corriendo. Se probó el flujo público a través del Gateway (`/auth/register` → 201, `/meals/platos` y `/planner/historial` sin token → 401) y se confirmó el log de Serilog escribiendo en `~/comidiaria/backend-net/logs/meals-api/`. El fix se subió a `main` y quedará validado en el próximo tag, que además ahora fallará ruidosamente si algo se rompe.
