@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "MealsDb": "Host=localhost;Port=5432;Database=meals_db;Username=comidiaria_admin;Password=REPLACE_ME"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "ConnectionStrings": {
+    "PlannerDb": "Host=localhost;Port=5432;Database=planner_db;Username=comidiaria_admin;Password=REPLACE_ME"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

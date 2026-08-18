@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet nuget *)",
+      "Bash(dotnet tool *)",
+      "Bash(dotnet ef *)",
+      "Bash(dotnet build *)",
+      "Bash(ssh -i \"/c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem\" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 azureuser@20.88.21.217 \"echo OK && docker --version && docker compose version && whoami\")",
+      "Bash(openssl rand *)",
+      "Bash(ssh -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem azureuser@20.88.21.217 'mkdir -p ~/comidiaria/postgres')",
+      "Bash(scp -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem /c/Users/de_or/AppData/Local/Temp/claude/e--PROYECTOS-PERSONALES-ProyectoComidas-backend-net/a7136ce9-0599-4909-a113-6f29bfdd7894/scratchpad/docker-compose.yml azureuser@20.88.21.217:~/comidiaria/postgres/docker-compose.yml)",
+      "Bash(scp -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem /c/Users/de_or/AppData/Local/Temp/claude/e--PROYECTOS-PERSONALES-ProyectoComidas-backend-net/a7136ce9-0599-4909-a113-6f29bfdd7894/scratchpad/init-databases.sh azureuser@20.88.21.217:~/comidiaria/postgres/init-databases.sh)",
+      "Bash(ssh -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem azureuser@20.88.21.217 'chmod +x ~/comidiaria/postgres/init-databases.sh && ls -la ~/comidiaria/postgres')",
+      "Bash(ssh -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem azureuser@20.88.21.217 'docker exec comidiaria-postgres psql -U comidiaria_admin -d meals_db -c '\\\\''\\\\dt'\\\\'' && docker exec comidiaria-postgres psql -U comidiaria_admin -d planner_db -c '\\\\''\\\\dt'\\\\''')",
+      "Bash(gh --version)",
+      "Bash(gh auth *)",
+      "PowerShell(Get-Command gh -ErrorAction SilentlyContinue)",
+      "PowerShell(gh --version 2>&1)",
+      "Bash(ssh -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem azureuser@20.88.21.217 'docker network ls | grep app-network')",
+      "Bash(ssh-keygen -t ed25519 -f /c/Users/de_or/AppData/Local/Temp/claude/e--PROYECTOS-PERSONALES-ProyectoComidas-backend-net/a7136ce9-0599-4909-a113-6f29bfdd7894/scratchpad/gh_actions_deploy_key -N '' -C github-actions-deploy)",
+      "Read(//c/Users/de_or/AppData/Local/Temp/claude/e--PROYECTOS-PERSONALES-ProyectoComidas-backend-net/a7136ce9-0599-4909-a113-6f29bfdd7894/scratchpad/**)",
+      "Bash(ssh -i /c/Users/de_or/Downloads/PrimeraPruebaAzure_key.pem azureuser@20.88.21.217 'mkdir -p ~/.ssh && echo '\\\\''ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFRlMK0CJxGBVe0PKcAeXhS43HrnCmXf56oT5UUGPevl github-actions-deploy'\\\\'' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo added')"
+    ]
+  }
+}
