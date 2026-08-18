@@ -1,0 +1,12 @@
+{
+  "ConnectionStrings": {
+    "MealsDb": "Host=localhost;Port=5432;Database=meals_db;Username=comidiaria_admin;Password=REPLACE_ME"
+  },
+  "JWT_SIGNING_KEY": "REPLACE_ME_LOCAL_DEV_SIGNING_KEY",
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}

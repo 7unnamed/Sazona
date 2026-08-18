@@ -1,25 +1,46 @@
 services:
+  auth-api:
+    build:
+      context: .
+      dockerfile: src/Services/Auth/Auth.Api/Dockerfile
+    container_name: auth-api
+    restart: unless-stopped
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+    volumes:
+      - ./logs/auth-api:/app/logs
+    networks:
+      - postgres_app-network
+
   meals-api:
     build:
       context: .
-      dockerfile: src/Services/Meals.Api/Dockerfile
+      dockerfile: src/Services/Meals/Meals.Api/Dockerfile
     container_name: meals-api
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+    volumes:
+      - ./logs/meals-api:/app/logs
     networks:
       - postgres_app-network
 
   planner-api:
     build:
       context: .
-      dockerfile: src/Services/Planner.Api/Dockerfile
+      dockerfile: src/Services/Planner/Planner.Api/Dockerfile
     container_name: planner-api
     restart: unless-stopped
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
+    volumes:
+      - ./logs/planner-api:/app/logs
     networks:
       - postgres_app-network
 
@@ -33,7 +54,10 @@ services:
       ASPNETCORE_ENVIRONMENT: Production
     ports:
       - "80:8080"
+    volumes:
+      - ./logs/api-gateway:/app/logs
     depends_on:
+      - auth-api
       - meals-api
       - planner-api
     networks:

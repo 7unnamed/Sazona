@@ -3,8 +3,28 @@
   <Folder Name="/src/Gateway/">
     <Project Path="src/Gateway/ApiGateway/ApiGateway.csproj" />
   </Folder>
-  <Folder Name="/src/Services/">
-    <Project Path="src/Services/Meals.Api/Meals.Api.csproj" />
-    <Project Path="src/Services/Planner.Api/Planner.Api.csproj" />
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Domain/BuildingBlocks.Domain.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Application/BuildingBlocks.Application.csproj" />
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Infrastructure/BuildingBlocks.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/Meals/">
+    <Project Path="src/Services/Meals/Meals.Domain/Meals.Domain.csproj" />
+    <Project Path="src/Services/Meals/Meals.Application/Meals.Application.csproj" />
+    <Project Path="src/Services/Meals/Meals.Infrastructure/Meals.Infrastructure.csproj" />
+    <Project Path="src/Services/Meals/Meals.Api/Meals.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Planner/">
+    <Project Path="src/Services/Planner/Planner.Domain/Planner.Domain.csproj" />
+    <Project Path="src/Services/Planner/Planner.Application/Planner.Application.csproj" />
+    <Project Path="src/Services/Planner/Planner.Infrastructure/Planner.Infrastructure.csproj" />
+    <Project Path="src/Services/Planner/Planner.Api/Planner.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/Auth/">
+    <Project Path="src/Services/Auth/Auth.Domain/Auth.Domain.csproj" />
+    <Project Path="src/Services/Auth/Auth.Application/Auth.Application.csproj" />
+    <Project Path="src/Services/Auth/Auth.Infrastructure/Auth.Infrastructure.csproj" />
+    <Project Path="src/Services/Auth/Auth.Api/Auth.Api.csproj" />
   </Folder>
 </Solution>

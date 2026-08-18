@@ -8,11 +8,16 @@
 .vscode/
 *.suo
 
-# Secrets / environment-specific config (contain local DB passwords)
-src/Services/Meals.Api/appsettings.Development.json
-src/Services/Planner.Api/appsettings.Development.json
+# Secrets / environment-specific config (contain local DB passwords / JWT signing key)
+src/Services/Meals/Meals.Api/appsettings.Development.json
+src/Services/Planner/Planner.Api/appsettings.Development.json
+src/Services/Auth/Auth.Api/appsettings.Development.json
 .env
 *.pem
+
+# Runtime logs (Serilog) — generated at runtime, not code
+logs/
+**/logs/
 
 # OS
 .DS_Store

@@ -1,4 +1,8 @@
+using BuildingBlocks.Infrastructure.Logging;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.UseSharedSerilog("ApiGateway");
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -14,6 +18,8 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+
+app.UseSharedRequestLogging();
 
 app.UseHttpsRedirection();
 
