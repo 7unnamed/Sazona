@@ -7,10 +7,12 @@ namespace Meals.Application.Services;
 public class PlatoService : IPlatoService
 {
     private readonly IPlatoRepository _platoRepository;
+    private readonly IIngredienteRepository _ingredienteRepository;
 
-    public PlatoService(IPlatoRepository platoRepository)
+    public PlatoService(IPlatoRepository platoRepository, IIngredienteRepository ingredienteRepository)
     {
         _platoRepository = platoRepository;
+        _ingredienteRepository = ingredienteRepository;
     }
 
     public async Task<List<PlatoResponse>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -31,14 +33,22 @@ public class PlatoService : IPlatoService
         {
             NombrePlato = request.NombrePlato,
             TipoComida = request.TipoComida,
-            PorcionesBase = request.PorcionesBase,
-            Ingredientes = request.Ingredientes.Select(i => new Ingrediente
-            {
-                NombreIngrediente = i.NombreIngrediente,
-                Cantidad = i.Cantidad,
-                Unidad = i.Unidad
-            }).ToList()
+            PorcionesBase = request.PorcionesBase
         };
+
+        foreach (var item in request.Ingredientes)
+        {
+            var ingrediente = await _ingredienteRepository.GetByIdAsync(item.IdIngrediente, cancellationToken)
+                ?? throw new InvalidOperationException($"No existe ningún ingrediente en el catálogo con Id {item.IdIngrediente}.");
+
+            plato.PlatoIngredientes.Add(new PlatoIngrediente
+            {
+                IdIngrediente = ingrediente.IdIngrediente,
+                Ingrediente = ingrediente,
+                Cantidad = item.Cantidad,
+                Unidad = item.Unidad
+            });
+        }
 
         _platoRepository.Add(plato);
         await _platoRepository.SaveChangesAsync(cancellationToken);
@@ -75,7 +85,7 @@ public class PlatoService : IPlatoService
         return true;
     }
 
-    public async Task<IngredienteResponse?> AddIngredienteAsync(int idPlato, IngredienteRequest request, CancellationToken cancellationToken = default)
+    public async Task<PlatoIngredienteResponse?> AddIngredienteAsync(int idPlato, AgregarIngredienteAPlatoRequest request, CancellationToken cancellationToken = default)
     {
         var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
         if (plato is null)
@@ -83,46 +93,52 @@ public class PlatoService : IPlatoService
             return null;
         }
 
-        var ingrediente = new Ingrediente
+        var ingrediente = await _ingredienteRepository.GetByIdAsync(request.IdIngrediente, cancellationToken);
+        if (ingrediente is null)
         {
-            NombreIngrediente = request.NombreIngrediente,
+            throw new InvalidOperationException($"No existe ningún ingrediente en el catálogo con Id {request.IdIngrediente}.");
+        }
+
+        var platoIngrediente = new PlatoIngrediente
+        {
+            IdIngrediente = ingrediente.IdIngrediente,
+            Ingrediente = ingrediente,
             Cantidad = request.Cantidad,
             Unidad = request.Unidad
         };
 
-        plato.Ingredientes.Add(ingrediente);
+        plato.PlatoIngredientes.Add(platoIngrediente);
         await _platoRepository.SaveChangesAsync(cancellationToken);
 
-        return new IngredienteResponse(ingrediente.IdIngrediente, ingrediente.NombreIngrediente, ingrediente.Cantidad, ingrediente.Unidad);
+        return ToResponse(platoIngrediente);
     }
 
-    public async Task<bool> UpdateIngredienteAsync(int idPlato, int idIngrediente, IngredienteRequest request, CancellationToken cancellationToken = default)
+    public async Task<bool> UpdateIngredienteAsync(int idPlato, int idPlatoIngrediente, ActualizarPlatoIngredienteRequest request, CancellationToken cancellationToken = default)
     {
         var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
-        var ingrediente = plato?.Ingredientes.FirstOrDefault(i => i.IdIngrediente == idIngrediente);
-        if (ingrediente is null)
+        var platoIngrediente = plato?.PlatoIngredientes.FirstOrDefault(pi => pi.IdPlatoIngrediente == idPlatoIngrediente);
+        if (platoIngrediente is null)
         {
             return false;
         }
 
-        ingrediente.NombreIngrediente = request.NombreIngrediente;
-        ingrediente.Cantidad = request.Cantidad;
-        ingrediente.Unidad = request.Unidad;
+        platoIngrediente.Cantidad = request.Cantidad;
+        platoIngrediente.Unidad = request.Unidad;
 
         await _platoRepository.SaveChangesAsync(cancellationToken);
         return true;
     }
 
-    public async Task<bool> RemoveIngredienteAsync(int idPlato, int idIngrediente, CancellationToken cancellationToken = default)
+    public async Task<bool> RemoveIngredienteAsync(int idPlato, int idPlatoIngrediente, CancellationToken cancellationToken = default)
     {
         var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
-        var ingrediente = plato?.Ingredientes.FirstOrDefault(i => i.IdIngrediente == idIngrediente);
-        if (ingrediente is null)
+        var platoIngrediente = plato?.PlatoIngredientes.FirstOrDefault(pi => pi.IdPlatoIngrediente == idPlatoIngrediente);
+        if (platoIngrediente is null)
         {
             return false;
         }
 
-        plato!.Ingredientes.Remove(ingrediente);
+        plato!.PlatoIngredientes.Remove(platoIngrediente);
         await _platoRepository.SaveChangesAsync(cancellationToken);
         return true;
     }
@@ -132,9 +148,12 @@ public class PlatoService : IPlatoService
         plato.NombrePlato,
         plato.TipoComida,
         plato.PorcionesBase,
-        plato.Ingredientes.Select(i => new IngredienteResponse(
-            i.IdIngrediente,
-            i.NombreIngrediente,
-            i.Cantidad,
-            i.Unidad)).ToList());
+        plato.PlatoIngredientes.Select(ToResponse).ToList());
+
+    private static PlatoIngredienteResponse ToResponse(PlatoIngrediente platoIngrediente) => new(
+        platoIngrediente.IdPlatoIngrediente,
+        platoIngrediente.IdIngrediente,
+        platoIngrediente.Ingrediente.Nombre,
+        platoIngrediente.Cantidad,
+        platoIngrediente.Unidad);
 }

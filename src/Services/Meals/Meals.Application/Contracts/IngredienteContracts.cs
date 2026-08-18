@@ -1,5 +1,9 @@
+using Meals.Domain.Enums;
+
 namespace Meals.Application.Contracts;
 
-public record IngredienteRequest(string NombreIngrediente, decimal Cantidad, string Unidad);
+public record CrearIngredienteRequest(string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion);
 
-public record IngredienteResponse(int IdIngrediente, string NombreIngrediente, decimal Cantidad, string Unidad);
+public record ActualizarIngredienteRequest(string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion);
+
+public record IngredienteResponse(int IdIngrediente, string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion);

@@ -1,16 +1,17 @@
 using BuildingBlocks.Domain.Auditing;
+using Meals.Domain.Enums;
 
 namespace Meals.Domain;
 
 public class Ingrediente : IAuditableEntity, ISoftDeletable
 {
     public int IdIngrediente { get; set; }
-    public string NombreIngrediente { get; set; } = string.Empty;
-    public decimal Cantidad { get; set; }
-    public string Unidad { get; set; } = string.Empty;
+    public string Nombre { get; set; } = string.Empty;
+    public string PaisProcedencia { get; set; } = string.Empty;
+    public CategoriaIngrediente Categoria { get; set; }
+    public string? Descripcion { get; set; }
 
-    public int IdPlato { get; set; }
-    public Plato Plato { get; set; } = null!;
+    public ICollection<PlatoIngrediente> PlatoIngredientes { get; set; } = new List<PlatoIngrediente>();
 
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

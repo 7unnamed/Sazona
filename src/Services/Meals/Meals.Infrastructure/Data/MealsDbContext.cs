@@ -14,6 +14,7 @@ public class MealsDbContext : AuditableDbContext
 
     public DbSet<Plato> Platos => Set<Plato>();
     public DbSet<Ingrediente> Ingredientes => Set<Ingrediente>();
+    public DbSet<PlatoIngrediente> PlatoIngredientes => Set<PlatoIngrediente>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,13 +27,25 @@ public class MealsDbContext : AuditableDbContext
         modelBuilder.Entity<Ingrediente>(entity =>
         {
             entity.HasKey(i => i.IdIngrediente);
-            entity.Property(i => i.NombreIngrediente).IsRequired().HasMaxLength(200);
-            entity.Property(i => i.Unidad).IsRequired().HasMaxLength(50);
+            entity.Property(i => i.Nombre).IsRequired().HasMaxLength(200);
+            entity.Property(i => i.PaisProcedencia).IsRequired().HasMaxLength(100);
+            entity.Property(i => i.Descripcion).HasMaxLength(500);
+        });
 
-            entity.HasOne(i => i.Plato)
-                .WithMany(p => p.Ingredientes)
-                .HasForeignKey(i => i.IdPlato)
+        modelBuilder.Entity<PlatoIngrediente>(entity =>
+        {
+            entity.HasKey(pi => pi.IdPlatoIngrediente);
+            entity.Property(pi => pi.Unidad).IsRequired().HasMaxLength(50);
+
+            entity.HasOne(pi => pi.Plato)
+                .WithMany(p => p.PlatoIngredientes)
+                .HasForeignKey(pi => pi.IdPlato)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pi => pi.Ingrediente)
+                .WithMany(i => i.PlatoIngredientes)
+                .HasForeignKey(pi => pi.IdIngrediente)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         ApplySoftDeleteQueryFilters(modelBuilder);

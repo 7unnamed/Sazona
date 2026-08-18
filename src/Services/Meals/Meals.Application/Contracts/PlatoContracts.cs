@@ -6,7 +6,7 @@ public record CrearPlatoRequest(
     string NombrePlato,
     TipoComida TipoComida,
     int PorcionesBase,
-    List<IngredienteRequest> Ingredientes);
+    List<AgregarIngredienteAPlatoRequest> Ingredientes);
 
 public record ActualizarPlatoRequest(
     string NombrePlato,
@@ -18,4 +18,4 @@ public record PlatoResponse(
     string NombrePlato,
     TipoComida TipoComida,
     int PorcionesBase,
-    List<IngredienteResponse> Ingredientes);
+    List<PlatoIngredienteResponse> Ingredientes);

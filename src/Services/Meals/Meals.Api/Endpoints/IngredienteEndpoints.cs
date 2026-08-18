@@ -7,25 +7,32 @@ public static class IngredienteEndpoints
 {
     public static void MapIngredienteEndpoints(this WebApplication app)
     {
-        var group = app.MapGroup("/platos/{idPlato:int}/ingredientes").WithTags("Ingredientes").RequireAuthorization();
+        var group = app.MapGroup("/ingredientes").WithTags("Ingredientes").RequireAuthorization();
 
-        group.MapPost("/", async (int idPlato, IngredienteRequest request, IPlatoService platoService) =>
+        group.MapGet("/", async (IIngredienteService ingredienteService) =>
+            Results.Ok(await ingredienteService.GetAllAsync()));
+
+        group.MapGet("/{idIngrediente:int}", async (int idIngrediente, IIngredienteService ingredienteService) =>
         {
-            var ingrediente = await platoService.AddIngredienteAsync(idPlato, request);
-            return ingrediente is null
-                ? Results.NotFound()
-                : Results.Created($"/platos/{idPlato}/ingredientes/{ingrediente.IdIngrediente}", ingrediente);
+            var ingrediente = await ingredienteService.GetByIdAsync(idIngrediente);
+            return ingrediente is null ? Results.NotFound() : Results.Ok(ingrediente);
         });
 
-        group.MapPut("/{idIngrediente:int}", async (int idPlato, int idIngrediente, IngredienteRequest request, IPlatoService platoService) =>
+        group.MapPost("/", async (CrearIngredienteRequest request, IIngredienteService ingredienteService) =>
         {
-            var actualizado = await platoService.UpdateIngredienteAsync(idPlato, idIngrediente, request);
+            var ingrediente = await ingredienteService.CreateAsync(request);
+            return Results.Created($"/ingredientes/{ingrediente.IdIngrediente}", ingrediente);
+        });
+
+        group.MapPut("/{idIngrediente:int}", async (int idIngrediente, ActualizarIngredienteRequest request, IIngredienteService ingredienteService) =>
+        {
+            var actualizado = await ingredienteService.UpdateAsync(idIngrediente, request);
             return actualizado ? Results.NoContent() : Results.NotFound();
         });
 
-        group.MapDelete("/{idIngrediente:int}", async (int idPlato, int idIngrediente, IPlatoService platoService) =>
+        group.MapDelete("/{idIngrediente:int}", async (int idIngrediente, IIngredienteService ingredienteService) =>
         {
-            var eliminado = await platoService.RemoveIngredienteAsync(idPlato, idIngrediente);
+            var eliminado = await ingredienteService.DeleteAsync(idIngrediente);
             return eliminado ? Results.NoContent() : Results.NotFound();
         });
     }

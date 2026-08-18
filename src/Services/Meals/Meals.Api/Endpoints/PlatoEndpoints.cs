@@ -20,8 +20,15 @@ public static class PlatoEndpoints
 
         group.MapPost("/", async (CrearPlatoRequest request, IPlatoService platoService) =>
         {
-            var plato = await platoService.CreateAsync(request);
-            return Results.Created($"/platos/{plato.IdPlato}", plato);
+            try
+            {
+                var plato = await platoService.CreateAsync(request);
+                return Results.Created($"/platos/{plato.IdPlato}", plato);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
         });
 
         group.MapPut("/{idPlato:int}", async (int idPlato, ActualizarPlatoRequest request, IPlatoService platoService) =>

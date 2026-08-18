@@ -17,14 +17,14 @@ public class PlatoRepository : IPlatoRepository
     public async Task<List<Plato>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.Platos
-            .Include(p => p.Ingredientes)
+            .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<Plato?> GetByIdAsync(int idPlato, CancellationToken cancellationToken = default)
     {
         return await _dbContext.Platos
-            .Include(p => p.Ingredientes)
+            .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
             .FirstOrDefaultAsync(p => p.IdPlato == idPlato, cancellationToken);
     }
 
