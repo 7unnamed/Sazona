@@ -6,6 +6,9 @@ public interface IPlatoService
 {
     Task<List<PlatoResponse>> GetAllAsync(CancellationToken cancellationToken = default);
     Task<PlatoResponse?> GetByIdAsync(int idPlato, CancellationToken cancellationToken = default);
+    Task<List<PlatoResponse>> SearchByNombreAsync(string nombre, CancellationToken cancellationToken = default);
+    Task<PlatoResponse?> GetRandomAsync(CancellationToken cancellationToken = default);
+    Task<List<PlatoResponse>> GetNoCocinadosAsync(int idUsuario, CancellationToken cancellationToken = default);
     Task<PlatoResponse> CreateAsync(CrearPlatoRequest request, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(int idPlato, ActualizarPlatoRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(int idPlato, CancellationToken cancellationToken = default);

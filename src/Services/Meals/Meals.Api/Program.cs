@@ -33,6 +33,8 @@ builder.Services.AddScoped<IPlatoRepository, PlatoRepository>();
 builder.Services.AddScoped<IPlatoService, PlatoService>();
 builder.Services.AddScoped<IIngredienteRepository, IngredienteRepository>();
 builder.Services.AddScoped<IIngredienteService, IngredienteService>();
+builder.Services.AddScoped<IFavoritoRepository, FavoritoRepository>();
+builder.Services.AddScoped<IFavoritoService, FavoritoService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -57,5 +59,6 @@ app.UseAuthorization();
 app.MapPlatoEndpoints();
 app.MapIngredienteEndpoints();
 app.MapPlatoIngredienteEndpoints();
+app.MapFavoritoEndpoints();
 
 app.Run();

@@ -27,6 +27,24 @@ public class PlatoService : IPlatoService
         return plato is null ? null : ToResponse(plato);
     }
 
+    public async Task<List<PlatoResponse>> SearchByNombreAsync(string nombre, CancellationToken cancellationToken = default)
+    {
+        var platos = await _platoRepository.SearchByNombreAsync(nombre, cancellationToken);
+        return platos.Select(ToResponse).ToList();
+    }
+
+    public async Task<PlatoResponse?> GetRandomAsync(CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetRandomAsync(cancellationToken);
+        return plato is null ? null : ToResponse(plato);
+    }
+
+    public async Task<List<PlatoResponse>> GetNoCocinadosAsync(int idUsuario, CancellationToken cancellationToken = default)
+    {
+        var platos = await _platoRepository.GetNoCocinadosAsync(idUsuario, cancellationToken);
+        return platos.Select(ToResponse).ToList();
+    }
+
     public async Task<PlatoResponse> CreateAsync(CrearPlatoRequest request, CancellationToken cancellationToken = default)
     {
         var plato = new Plato

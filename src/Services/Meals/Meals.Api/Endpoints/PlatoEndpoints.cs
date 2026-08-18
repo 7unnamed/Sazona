@@ -1,3 +1,4 @@
+using BuildingBlocks.Application.Interfaces;
 using Meals.Application.Contracts;
 using Meals.Application.Interfaces;
 
@@ -11,6 +12,21 @@ public static class PlatoEndpoints
 
         group.MapGet("/", async (IPlatoService platoService) =>
             Results.Ok(await platoService.GetAllAsync()));
+
+        group.MapGet("/buscar", async (string nombre, IPlatoService platoService) =>
+            Results.Ok(await platoService.SearchByNombreAsync(nombre)));
+
+        group.MapGet("/aleatorio", async (IPlatoService platoService) =>
+        {
+            var plato = await platoService.GetRandomAsync();
+            return plato is null ? Results.NotFound() : Results.Ok(plato);
+        });
+
+        group.MapGet("/descubrir", async (IPlatoService platoService, ICurrentUserService currentUserService) =>
+        {
+            var idUsuario = int.Parse(currentUserService.UserId!);
+            return Results.Ok(await platoService.GetNoCocinadosAsync(idUsuario));
+        });
 
         group.MapGet("/{idPlato:int}", async (int idPlato, IPlatoService platoService) =>
         {
