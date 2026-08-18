@@ -2,7 +2,8 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
 
 jobs:
   deploy:
@@ -16,7 +17,8 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             cd ~/comidiaria/backend-net
-            git pull origin main
+            git fetch --tags --force
+            git checkout ${{ github.ref_name }}
             docker compose build
             docker compose up -d
             docker image prune -f
