@@ -26,6 +26,7 @@ services:
       JWT_SIGNING_KEY: ${JWT_SIGNING_KEY}
     volumes:
       - ./logs/meals-api:/app/logs
+      - ./uploads/meals-api:/app/wwwroot/uploads
     networks:
       - postgres_app-network
 

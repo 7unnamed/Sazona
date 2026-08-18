@@ -12,6 +12,7 @@ public interface IPlatoService
     Task<PlatoResponse> CreateAsync(CrearPlatoRequest request, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(int idPlato, ActualizarPlatoRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(int idPlato, CancellationToken cancellationToken = default);
+    Task<PlatoResponse?> SetImagenAsync(int idPlato, string imagenUrl, CancellationToken cancellationToken = default);
 
     Task<PlatoIngredienteResponse?> AddIngredienteAsync(int idPlato, AgregarIngredienteAPlatoRequest request, CancellationToken cancellationToken = default);
     Task<bool> UpdateIngredienteAsync(int idPlato, int idPlatoIngrediente, ActualizarPlatoIngredienteRequest request, CancellationToken cancellationToken = default);

@@ -9,4 +9,5 @@ public interface IIngredienteService
     Task<IngredienteResponse> CreateAsync(CrearIngredienteRequest request, CancellationToken cancellationToken = default);
     Task<bool> UpdateAsync(int idIngrediente, ActualizarIngredienteRequest request, CancellationToken cancellationToken = default);
     Task<bool> DeleteAsync(int idIngrediente, CancellationToken cancellationToken = default);
+    Task<IngredienteResponse?> SetImagenAsync(int idIngrediente, string imagenUrl, CancellationToken cancellationToken = default);
 }

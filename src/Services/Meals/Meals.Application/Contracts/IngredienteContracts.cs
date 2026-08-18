@@ -6,4 +6,4 @@ public record CrearIngredienteRequest(string Nombre, string PaisProcedencia, Cat
 
 public record ActualizarIngredienteRequest(string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion);
 
-public record IngredienteResponse(int IdIngrediente, string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion);
+public record IngredienteResponse(int IdIngrediente, string Nombre, string PaisProcedencia, CategoriaIngrediente Categoria, string? Descripcion, string? ImagenUrl);

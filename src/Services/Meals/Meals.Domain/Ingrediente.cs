@@ -10,6 +10,7 @@ public class Ingrediente : IAuditableEntity, ISoftDeletable
     public string PaisProcedencia { get; set; } = string.Empty;
     public CategoriaIngrediente Categoria { get; set; }
     public string? Descripcion { get; set; }
+    public string? ImagenUrl { get; set; }
 
     public ICollection<PlatoIngrediente> PlatoIngredientes { get; set; } = new List<PlatoIngrediente>();
 

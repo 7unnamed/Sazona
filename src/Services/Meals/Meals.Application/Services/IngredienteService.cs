@@ -71,10 +71,24 @@ public class IngredienteService : IIngredienteService
         return true;
     }
 
+    public async Task<IngredienteResponse?> SetImagenAsync(int idIngrediente, string imagenUrl, CancellationToken cancellationToken = default)
+    {
+        var ingrediente = await _ingredienteRepository.GetByIdAsync(idIngrediente, cancellationToken);
+        if (ingrediente is null)
+        {
+            return null;
+        }
+
+        ingrediente.ImagenUrl = imagenUrl;
+        await _ingredienteRepository.SaveChangesAsync(cancellationToken);
+        return ToResponse(ingrediente);
+    }
+
     private static IngredienteResponse ToResponse(Ingrediente ingrediente) => new(
         ingrediente.IdIngrediente,
         ingrediente.Nombre,
         ingrediente.PaisProcedencia,
         ingrediente.Categoria,
-        ingrediente.Descripcion);
+        ingrediente.Descripcion,
+        ingrediente.ImagenUrl);
 }

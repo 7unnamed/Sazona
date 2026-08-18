@@ -103,6 +103,19 @@ public class PlatoService : IPlatoService
         return true;
     }
 
+    public async Task<PlatoResponse?> SetImagenAsync(int idPlato, string imagenUrl, CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
+        if (plato is null)
+        {
+            return null;
+        }
+
+        plato.ImagenUrl = imagenUrl;
+        await _platoRepository.SaveChangesAsync(cancellationToken);
+        return ToResponse(plato);
+    }
+
     public async Task<PlatoIngredienteResponse?> AddIngredienteAsync(int idPlato, AgregarIngredienteAPlatoRequest request, CancellationToken cancellationToken = default)
     {
         var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
@@ -166,7 +179,8 @@ public class PlatoService : IPlatoService
         plato.NombrePlato,
         plato.TipoComida,
         plato.PorcionesBase,
-        plato.PlatoIngredientes.Select(ToResponse).ToList());
+        plato.PlatoIngredientes.Select(ToResponse).ToList(),
+        plato.ImagenUrl);
 
     private static PlatoIngredienteResponse ToResponse(PlatoIngrediente platoIngrediente) => new(
         platoIngrediente.IdPlatoIngrediente,

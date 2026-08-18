@@ -1,5 +1,7 @@
 using Meals.Application.Contracts;
 using Meals.Application.Interfaces;
+using Meals.Infrastructure.Storage;
+using Microsoft.AspNetCore.Http;
 
 namespace Meals.Api.Endpoints;
 
@@ -35,5 +37,19 @@ public static class IngredienteEndpoints
             var eliminado = await ingredienteService.DeleteAsync(idIngrediente);
             return eliminado ? Results.NoContent() : Results.NotFound();
         });
+
+        group.MapPost("/{idIngrediente:int}/imagen", async (int idIngrediente, IFormFile archivo, IIngredienteService ingredienteService, ImagenStorageService storage) =>
+        {
+            try
+            {
+                var imagenUrl = await storage.GuardarAsync(archivo, "ingredientes");
+                var ingrediente = await ingredienteService.SetImagenAsync(idIngrediente, imagenUrl);
+                return ingrediente is null ? Results.NotFound() : Results.Ok(ingrediente);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
+        }).DisableAntiforgery();
     }
 }

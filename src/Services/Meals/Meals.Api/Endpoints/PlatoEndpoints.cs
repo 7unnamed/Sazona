@@ -1,6 +1,8 @@
 using BuildingBlocks.Application.Interfaces;
 using Meals.Application.Contracts;
 using Meals.Application.Interfaces;
+using Meals.Infrastructure.Storage;
+using Microsoft.AspNetCore.Http;
 
 namespace Meals.Api.Endpoints;
 
@@ -58,5 +60,19 @@ public static class PlatoEndpoints
             var eliminado = await platoService.DeleteAsync(idPlato);
             return eliminado ? Results.NoContent() : Results.NotFound();
         });
+
+        group.MapPost("/{idPlato:int}/imagen", async (int idPlato, IFormFile archivo, IPlatoService platoService, ImagenStorageService storage) =>
+        {
+            try
+            {
+                var imagenUrl = await storage.GuardarAsync(archivo, "platos");
+                var plato = await platoService.SetImagenAsync(idPlato, imagenUrl);
+                return plato is null ? Results.NotFound() : Results.Ok(plato);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Results.BadRequest(new { message = ex.Message });
+            }
+        }).DisableAntiforgery();
     }
 }

@@ -7,6 +7,7 @@ using Meals.Application.Interfaces;
 using Meals.Application.Services;
 using Meals.Infrastructure.Data;
 using Meals.Infrastructure.Repositories;
+using Meals.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -36,6 +37,10 @@ builder.Services.AddScoped<IIngredienteService, IngredienteService>();
 builder.Services.AddScoped<IFavoritoRepository, FavoritoRepository>();
 builder.Services.AddScoped<IFavoritoService, FavoritoService>();
 
+var wwwRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+Directory.CreateDirectory(wwwRootPath);
+builder.Services.AddSingleton(new ImagenStorageService(wwwRootPath));
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 builder.Services.AddSharedJwtAuthentication(builder.Configuration);
@@ -52,6 +57,8 @@ if (app.Environment.IsDevelopment())
 app.UseSharedRequestLogging();
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -9,6 +9,7 @@ public class Plato : IAuditableEntity, ISoftDeletable
     public string NombrePlato { get; set; } = string.Empty;
     public TipoComida TipoComida { get; set; }
     public int PorcionesBase { get; set; }
+    public string? ImagenUrl { get; set; }
 
     public ICollection<PlatoIngrediente> PlatoIngredientes { get; set; } = new List<PlatoIngrediente>();
 
