@@ -61,5 +61,8 @@ public class FavoritoService : IFavoritoService
     private static FavoritoResponse ToResponse(Favorito favorito) => new(
         favorito.IdFavorito,
         favorito.IdPlato,
-        favorito.Plato.NombrePlato);
+        favorito.Plato.NombrePlato,
+        favorito.Plato.TipoComida,
+        favorito.Plato.PorcionesBase,
+        favorito.Plato.ImagenUrl);
 }
