@@ -3,6 +3,8 @@ services:
     image: traefik:v3.5
     container_name: traefik
     restart: unless-stopped
+    environment:
+      DOCKER_API_VERSION: "1.51"
     command:
       - --providers.docker=true
       - --providers.docker.exposedbydefault=false
