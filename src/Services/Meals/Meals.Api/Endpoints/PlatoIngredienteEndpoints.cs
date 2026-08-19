@@ -22,18 +22,18 @@ public static class PlatoIngredienteEndpoints
             {
                 return Results.BadRequest(new { message = ex.Message });
             }
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapPut("/{idPlatoIngrediente:int}", async (int idPlato, int idPlatoIngrediente, ActualizarPlatoIngredienteRequest request, IPlatoService platoService) =>
         {
             var actualizado = await platoService.UpdateIngredienteAsync(idPlato, idPlatoIngrediente, request);
             return actualizado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapDelete("/{idPlatoIngrediente:int}", async (int idPlato, int idPlatoIngrediente, IPlatoService platoService) =>
         {
             var eliminado = await platoService.RemoveIngredienteAsync(idPlato, idPlatoIngrediente);
             return eliminado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
     }
 }

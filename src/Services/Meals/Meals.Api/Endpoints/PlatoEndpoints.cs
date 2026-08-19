@@ -47,19 +47,19 @@ public static class PlatoEndpoints
             {
                 return Results.BadRequest(new { message = ex.Message });
             }
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapPut("/{idPlato:int}", async (int idPlato, ActualizarPlatoRequest request, IPlatoService platoService) =>
         {
             var actualizado = await platoService.UpdateAsync(idPlato, request);
             return actualizado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapDelete("/{idPlato:int}", async (int idPlato, IPlatoService platoService) =>
         {
             var eliminado = await platoService.DeleteAsync(idPlato);
             return eliminado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapPost("/{idPlato:int}/imagen", async (int idPlato, IFormFile archivo, IPlatoService platoService, ImagenStorageService storage) =>
         {
@@ -73,6 +73,6 @@ public static class PlatoEndpoints
             {
                 return Results.BadRequest(new { message = ex.Message });
             }
-        }).DisableAntiforgery();
+        }).RequireAuthorization(p => p.RequireRole("Administrador")).DisableAntiforgery();
     }
 }

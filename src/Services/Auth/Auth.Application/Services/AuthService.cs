@@ -44,7 +44,7 @@ public class AuthService : IAuthService
             Username = request.Username,
             Email = request.Email,
             PasswordHash = _passwordHasher.Hash(request.Password),
-            Rol = RolUsuario.Usuario
+            Rol = RolUsuario.Cliente
         };
 
         _usuarioRepository.Add(usuario);

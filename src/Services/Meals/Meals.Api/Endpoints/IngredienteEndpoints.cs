@@ -24,19 +24,19 @@ public static class IngredienteEndpoints
         {
             var ingrediente = await ingredienteService.CreateAsync(request);
             return Results.Created($"/ingredientes/{ingrediente.IdIngrediente}", ingrediente);
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapPut("/{idIngrediente:int}", async (int idIngrediente, ActualizarIngredienteRequest request, IIngredienteService ingredienteService) =>
         {
             var actualizado = await ingredienteService.UpdateAsync(idIngrediente, request);
             return actualizado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapDelete("/{idIngrediente:int}", async (int idIngrediente, IIngredienteService ingredienteService) =>
         {
             var eliminado = await ingredienteService.DeleteAsync(idIngrediente);
             return eliminado ? Results.NoContent() : Results.NotFound();
-        });
+        }).RequireAuthorization(p => p.RequireRole("Administrador"));
 
         group.MapPost("/{idIngrediente:int}/imagen", async (int idIngrediente, IFormFile archivo, IIngredienteService ingredienteService, ImagenStorageService storage) =>
         {
@@ -50,6 +50,6 @@ public static class IngredienteEndpoints
             {
                 return Results.BadRequest(new { message = ex.Message });
             }
-        }).DisableAntiforgery();
+        }).RequireAuthorization(p => p.RequireRole("Administrador")).DisableAntiforgery();
     }
 }
