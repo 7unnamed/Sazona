@@ -174,13 +174,76 @@ public class PlatoService : IPlatoService
         return true;
     }
 
+    public async Task<PasoPreparacionResponse?> AddPasoAsync(int idPlato, AgregarPasoPreparacionRequest request, CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
+        if (plato is null)
+        {
+            return null;
+        }
+
+        var siguienteOrden = plato.PasosPreparacion.Count == 0 ? 1 : plato.PasosPreparacion.Max(p => p.Orden) + 1;
+        var paso = new PasoPreparacion
+        {
+            IdPlato = idPlato,
+            Orden = siguienteOrden,
+            Descripcion = request.Descripcion
+        };
+
+        plato.PasosPreparacion.Add(paso);
+        await _platoRepository.SaveChangesAsync(cancellationToken);
+
+        return ToResponse(paso);
+    }
+
+    public async Task<bool> UpdatePasoAsync(int idPlato, int idPaso, ActualizarPasoPreparacionRequest request, CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
+        var paso = plato?.PasosPreparacion.FirstOrDefault(p => p.IdPasoPreparacion == idPaso);
+        if (paso is null)
+        {
+            return false;
+        }
+
+        paso.Descripcion = request.Descripcion;
+        await _platoRepository.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> RemovePasoAsync(int idPlato, int idPaso, CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
+        var paso = plato?.PasosPreparacion.FirstOrDefault(p => p.IdPasoPreparacion == idPaso);
+        if (paso is null)
+        {
+            return false;
+        }
+
+        plato!.PasosPreparacion.Remove(paso);
+        await _platoRepository.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> MarcarCocinadoAsync(int idPlato, int idUsuario, CancellationToken cancellationToken = default)
+    {
+        var plato = await _platoRepository.GetByIdAsync(idPlato, cancellationToken);
+        if (plato is null)
+        {
+            return false;
+        }
+
+        await _platoRepository.MarcarCocinadoAsync(idPlato, idUsuario, cancellationToken);
+        return true;
+    }
+
     private static PlatoResponse ToResponse(Plato plato) => new(
         plato.IdPlato,
         plato.NombrePlato,
         plato.TipoComida,
         plato.PorcionesBase,
         plato.PlatoIngredientes.Select(ToResponse).ToList(),
-        plato.ImagenUrl);
+        plato.ImagenUrl,
+        plato.PasosPreparacion.OrderBy(p => p.Orden).Select(ToResponse).ToList());
 
     private static PlatoIngredienteResponse ToResponse(PlatoIngrediente platoIngrediente) => new(
         platoIngrediente.IdPlatoIngrediente,
@@ -188,4 +251,9 @@ public class PlatoService : IPlatoService
         platoIngrediente.Ingrediente.Nombre,
         platoIngrediente.Cantidad,
         platoIngrediente.Unidad);
+
+    private static PasoPreparacionResponse ToResponse(PasoPreparacion paso) => new(
+        paso.IdPasoPreparacion,
+        paso.Orden,
+        paso.Descripcion);
 }

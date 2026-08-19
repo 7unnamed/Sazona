@@ -18,6 +18,7 @@ public class PlatoRepository : IPlatoRepository
     {
         return await _dbContext.Platos
             .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
+            .Include(p => p.PasosPreparacion)
             .ToListAsync(cancellationToken);
     }
 
@@ -25,6 +26,7 @@ public class PlatoRepository : IPlatoRepository
     {
         return await _dbContext.Platos
             .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
+            .Include(p => p.PasosPreparacion)
             .FirstOrDefaultAsync(p => p.IdPlato == idPlato, cancellationToken);
     }
 
@@ -32,6 +34,7 @@ public class PlatoRepository : IPlatoRepository
     {
         return await _dbContext.Platos
             .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
+            .Include(p => p.PasosPreparacion)
             .Where(p => EF.Functions.ILike(p.NombrePlato, $"%{nombre}%"))
             .ToListAsync(cancellationToken);
     }
@@ -40,6 +43,7 @@ public class PlatoRepository : IPlatoRepository
     {
         return await _dbContext.Platos
             .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
+            .Include(p => p.PasosPreparacion)
             .OrderBy(p => EF.Functions.Random())
             .FirstOrDefaultAsync(cancellationToken);
     }
@@ -52,8 +56,20 @@ public class PlatoRepository : IPlatoRepository
 
         return await _dbContext.Platos
             .Include(p => p.PlatoIngredientes).ThenInclude(pi => pi.Ingrediente)
+            .Include(p => p.PasosPreparacion)
             .Where(p => !idsCocinados.Contains(p.IdPlato))
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task MarcarCocinadoAsync(int idPlato, int idUsuario, CancellationToken cancellationToken = default)
+    {
+        _dbContext.Set<PlatoCocinado>().Add(new PlatoCocinado
+        {
+            IdPlato = idPlato,
+            IdUsuario = idUsuario,
+            FechaCocinado = DateTime.UtcNow
+        });
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public void Add(Plato plato) => _dbContext.Platos.Add(plato);

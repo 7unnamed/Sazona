@@ -74,5 +74,12 @@ public static class PlatoEndpoints
                 return Results.BadRequest(new { message = ex.Message });
             }
         }).RequireAuthorization(p => p.RequireRole("Administrador")).DisableAntiforgery();
+
+        group.MapPost("/{idPlato:int}/cocinado", async (int idPlato, IPlatoService platoService, ICurrentUserService currentUserService) =>
+        {
+            var idUsuario = int.Parse(currentUserService.UserId!);
+            var marcado = await platoService.MarcarCocinadoAsync(idPlato, idUsuario);
+            return marcado ? Results.NoContent() : Results.NotFound();
+        });
     }
 }

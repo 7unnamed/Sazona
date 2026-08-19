@@ -17,6 +17,7 @@ public class MealsDbContext : AuditableDbContext
     public DbSet<PlatoIngrediente> PlatoIngredientes => Set<PlatoIngrediente>();
     public DbSet<Favorito> Favoritos => Set<Favorito>();
     public DbSet<PlatoCocinado> PlatosCocinados => Set<PlatoCocinado>();
+    public DbSet<PasoPreparacion> PasosPreparacion => Set<PasoPreparacion>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -68,6 +69,17 @@ public class MealsDbContext : AuditableDbContext
             entity.HasOne(pc => pc.Plato)
                 .WithMany()
                 .HasForeignKey(pc => pc.IdPlato)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<PasoPreparacion>(entity =>
+        {
+            entity.HasKey(p => p.IdPasoPreparacion);
+            entity.Property(p => p.Descripcion).IsRequired().HasMaxLength(500);
+
+            entity.HasOne(p => p.Plato)
+                .WithMany(p => p.PasosPreparacion)
+                .HasForeignKey(p => p.IdPlato)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 

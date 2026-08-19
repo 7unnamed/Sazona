@@ -66,6 +66,7 @@ app.UseAuthorization();
 app.MapPlatoEndpoints();
 app.MapIngredienteEndpoints();
 app.MapPlatoIngredienteEndpoints();
+app.MapPasoPreparacionEndpoints();
 app.MapFavoritoEndpoints();
 
 app.Run();

@@ -12,6 +12,7 @@ public class Plato : IAuditableEntity, ISoftDeletable
     public string? ImagenUrl { get; set; }
 
     public ICollection<PlatoIngrediente> PlatoIngredientes { get; set; } = new List<PlatoIngrediente>();
+    public ICollection<PasoPreparacion> PasosPreparacion { get; set; } = new List<PasoPreparacion>();
 
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }

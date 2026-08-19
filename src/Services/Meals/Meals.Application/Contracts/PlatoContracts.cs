@@ -19,4 +19,5 @@ public record PlatoResponse(
     TipoComida TipoComida,
     int PorcionesBase,
     List<PlatoIngredienteResponse> Ingredientes,
-    string? ImagenUrl);
+    string? ImagenUrl,
+    List<PasoPreparacionResponse> PasosPreparacion);
